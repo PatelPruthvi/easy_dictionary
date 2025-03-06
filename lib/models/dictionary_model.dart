@@ -2,19 +2,19 @@ import 'dart:convert';
 
 class DictionaryModel {
   String word;
-  String phonetic;
+  String? phonetic;
   List<Phonetic> phonetics;
   List<Meaning> meanings;
-  License license;
-  List<String> sourceUrls;
+  License? license;
+  List<String>? sourceUrls;
 
   DictionaryModel({
     required this.word,
-    required this.phonetic,
+    this.phonetic,
     required this.phonetics,
     required this.meanings,
-    required this.license,
-    required this.sourceUrls,
+    this.license,
+    this.sourceUrls,
   });
 
   factory DictionaryModel.fromRawJson(String str) =>
@@ -24,23 +24,28 @@ class DictionaryModel {
 
   factory DictionaryModel.fromJson(Map<String, dynamic> json) =>
       DictionaryModel(
-        word: json["word"],
+        word: json["word"] ?? "Unknown",
         phonetic: json["phonetic"],
-        phonetics: List<Phonetic>.from(
-            json["phonetics"].map((x) => Phonetic.fromJson(x))),
-        meanings: List<Meaning>.from(
-            json["meanings"].map((x) => Meaning.fromJson(x))),
-        license: License.fromJson(json["license"]),
-        sourceUrls: List<String>.from(json["sourceUrls"].map((x) => x)),
+        phonetics: (json["phonetics"] as List?)
+                ?.map((x) => Phonetic.fromJson(x))
+                .toList() ??
+            [],
+        meanings: (json["meanings"] as List?)
+                ?.map((x) => Meaning.fromJson(x))
+                .toList() ??
+            [],
+        license:
+            json["license"] != null ? License.fromJson(json["license"]) : null,
+        sourceUrls: (json["sourceUrls"] as List?)?.cast<String>() ?? [],
       );
 
   Map<String, dynamic> toJson() => {
         "word": word,
         "phonetic": phonetic,
-        "phonetics": List<dynamic>.from(phonetics.map((x) => x.toJson())),
-        "meanings": List<dynamic>.from(meanings.map((x) => x.toJson())),
-        "license": license.toJson(),
-        "sourceUrls": List<dynamic>.from(sourceUrls.map((x) => x)),
+        "phonetics": phonetics.map((x) => x.toJson()).toList(),
+        "meanings": meanings.map((x) => x.toJson()).toList(),
+        "license": license?.toJson(),
+        "sourceUrls": sourceUrls,
       };
 }
 
@@ -48,18 +53,15 @@ class License {
   String name;
   String url;
 
-  License({
-    required this.name,
-    required this.url,
-  });
+  License({required this.name, required this.url});
 
   factory License.fromRawJson(String str) => License.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
   factory License.fromJson(Map<String, dynamic> json) => License(
-        name: json["name"],
-        url: json["url"],
+        name: json["name"] ?? "",
+        url: json["url"] ?? "",
       );
 
   Map<String, dynamic> toJson() => {
@@ -86,32 +88,34 @@ class Meaning {
   String toRawJson() => json.encode(toJson());
 
   factory Meaning.fromJson(Map<String, dynamic> json) => Meaning(
-        partOfSpeech: json["partOfSpeech"],
-        definitions: List<Definition>.from(
-            json["definitions"].map((x) => Definition.fromJson(x))),
-        synonyms: List<String>.from(json["synonyms"].map((x) => x)),
-        antonyms: List<String>.from(json["antonyms"].map((x) => x)),
+        partOfSpeech: json["partOfSpeech"] ?? "unknown",
+        definitions: (json["definitions"] as List?)
+                ?.map((x) => Definition.fromJson(x))
+                .toList() ??
+            [],
+        synonyms: (json["synonyms"] as List?)?.cast<String>() ?? [],
+        antonyms: (json["antonyms"] as List?)?.cast<String>() ?? [],
       );
 
   Map<String, dynamic> toJson() => {
         "partOfSpeech": partOfSpeech,
-        "definitions": List<dynamic>.from(definitions.map((x) => x.toJson())),
-        "synonyms": List<dynamic>.from(synonyms.map((x) => x)),
-        "antonyms": List<dynamic>.from(antonyms.map((x) => x)),
+        "definitions": definitions.map((x) => x.toJson()).toList(),
+        "synonyms": synonyms,
+        "antonyms": antonyms,
       };
 }
 
 class Definition {
   String definition;
-  List<dynamic> synonyms;
-  List<dynamic> antonyms;
-  String example;
+  List<String> synonyms;
+  List<String> antonyms;
+  String? example;
 
   Definition({
     required this.definition,
     required this.synonyms,
     required this.antonyms,
-    required this.example,
+    this.example,
   });
 
   factory Definition.fromRawJson(String str) =>
@@ -120,31 +124,31 @@ class Definition {
   String toRawJson() => json.encode(toJson());
 
   factory Definition.fromJson(Map<String, dynamic> json) => Definition(
-        definition: json["definition"],
-        synonyms: List<dynamic>.from(json["synonyms"].map((x) => x)),
-        antonyms: List<dynamic>.from(json["antonyms"].map((x) => x)),
+        definition: json["definition"] ?? "",
+        synonyms: (json["synonyms"] as List?)?.cast<String>() ?? [],
+        antonyms: (json["antonyms"] as List?)?.cast<String>() ?? [],
         example: json["example"],
       );
 
   Map<String, dynamic> toJson() => {
         "definition": definition,
-        "synonyms": List<dynamic>.from(synonyms.map((x) => x)),
-        "antonyms": List<dynamic>.from(antonyms.map((x) => x)),
+        "synonyms": synonyms,
+        "antonyms": antonyms,
         "example": example,
       };
 }
 
 class Phonetic {
-  String text;
-  String audio;
-  String sourceUrl;
-  License license;
+  String? text;
+  String? audio;
+  String? sourceUrl;
+  License? license;
 
   Phonetic({
-    required this.text,
-    required this.audio,
-    required this.sourceUrl,
-    required this.license,
+    this.text,
+    this.audio,
+    this.sourceUrl,
+    this.license,
   });
 
   factory Phonetic.fromRawJson(String str) =>
@@ -156,13 +160,14 @@ class Phonetic {
         text: json["text"],
         audio: json["audio"],
         sourceUrl: json["sourceUrl"],
-        license: License.fromJson(json["license"]),
+        license:
+            json["license"] != null ? License.fromJson(json["license"]) : null,
       );
 
   Map<String, dynamic> toJson() => {
         "text": text,
         "audio": audio,
         "sourceUrl": sourceUrl,
-        "license": license.toJson(),
+        "license": license?.toJson(),
       };
 }
