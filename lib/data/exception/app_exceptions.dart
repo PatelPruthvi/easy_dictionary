@@ -33,4 +33,23 @@ class TimeoutException extends AppException {
   TimeoutException() : super(ErrorMessages.timeout);
 }
 
+class DefinitionNotFoundException extends AppException {
+  DefinitionNotFoundException() : super(ErrorMessages.definitions);
+}
+
+class AudioNotAvailableException extends AppException {
+  AudioNotAvailableException() : super(ErrorMessages.audio);
+}
+
+class AudioUnableToPlayException extends AppException {
+  AudioUnableToPlayException() : super(ErrorMessages.audioPlayerError);
+}
+
+class UrlCannotLaunchException extends AppException {
+  UrlCannotLaunchException() : super(ErrorMessages.url);
+}
+
+class RateLimiterException extends AppException {
+  RateLimiterException() : super(ErrorMessages.rateLimiter);
+}
 // Add more custom exceptions as needed...

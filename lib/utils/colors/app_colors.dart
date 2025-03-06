@@ -10,4 +10,9 @@ class AppColors {
   static const Color kOrange = Color(0xffF6DED2);
   static const Color kLightBlue = Color(0xffECF7FE);
   static const Color kBlue = Color(0xffB7E3FC);
+  static const Color kLavendarTint = Color(0xffF2EEFF);
+  static Color kRed = Colors.red.shade600;
+  static const Color kPeach = Color(0xFFFBF2EE);
+  static Color kGrey = Colors.grey.shade300;
+  static Color kLightGrey = Colors.grey.shade100;
 }
