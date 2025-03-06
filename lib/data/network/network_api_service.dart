@@ -51,6 +51,10 @@ dynamic returnResponse(http.Response response) {
       throw UnauthorizedException();
     case 403:
       throw ForbiddenException();
+    case 404:
+      throw DefinitionNotFoundException(); //referred from dictionaryapi github docs
+    case 429:
+      throw RateLimiterException(); //referred from dictionaryapi github docs
     case 500:
       throw ServerException();
     default:
