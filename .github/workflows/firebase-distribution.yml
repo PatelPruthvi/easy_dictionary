@@ -44,12 +44,15 @@ jobs:
           echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
           echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
-    #   - name: Set up Keystore for Signing
-    #     run: |
-    #       echo "KEYSTORE_PATH=$GITHUB_WORKSPACE/android/app/upload-keystore.jks" >> $GITHUB_ENV
-    #       echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
-    #       echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
-    #       echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
+
+      - name: Check if Keystore Exists
+        run: |
+            echo "Checking if keystore file exists..."
+            ls -l android/app
+            file android/app/upload-keystore.jks
+            keytool -list -keystore android/app/upload-keystore.jks -storepass ${{ secrets.ANDROID_KEYSTORE_PASSWORD }} -v || echo "Keystore file is missing or incorrect"
+  
+   
 
       - name: Build Signed APK
         run: flutter build apk --release
