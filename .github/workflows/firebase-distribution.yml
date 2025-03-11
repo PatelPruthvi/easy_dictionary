@@ -14,6 +14,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+         # 🎯 Create firebase_options.dart dynamically from GitHub Secrets
+      - name: Create firebase_options.dart
+        run: echo "$FIREBASE_OPTIONS" > lib/firebase_options.dart
+        shell: bash
+        env:
+            FIREBASE_OPTIONS: ${{ secrets.FIREBASE_OPTIONS }}
+            
+      - name: Create google-services.json
+        run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
+        shell: bash
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
