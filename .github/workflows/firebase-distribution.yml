@@ -41,16 +41,16 @@ jobs:
       - name: Setup key.properties
         run: |
           echo "storeFile=$(pwd)/android/app/upload-keystore.jks" > android/key.properties
-          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
-          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
-          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
+          echo "storePassword=${{secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyPassword=${{secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
 
       - name: Check if Keystore Exists
         run: |
             echo "Checking if keystore file exists..."
             ls -l android/app
             file android/app/upload-keystore.jks
-            keytool -list -keystore android/app/upload-keystore.jks -storepass ${{ secrets.ANDROID_KEYSTORE_PASSWORD }} -v || echo "Keystore file is missing or incorrect"
+            keytool -list -keystore android/app/upload-keystore.jks -storepass ${{secrets.ANDROID_KEYSTORE_PASSWORD }} -v || echo "Keystore file is missing or incorrect"
 
       - name: Verify keystore content
         run: |
