@@ -66,6 +66,6 @@ jobs:
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
           serviceCredentialsFileContent: ${{ secrets.SERVICE_ACCOUNT_KEY }}
-          groups: testers
+          groups: alpha
           file: build/app/outputs/flutter-apk/app-release.apk
           releaseNotes: "Automated Signed Build for Testing"
