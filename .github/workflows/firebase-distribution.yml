@@ -51,8 +51,11 @@ jobs:
             ls -l android/app
             file android/app/upload-keystore.jks
             keytool -list -keystore android/app/upload-keystore.jks -storepass ${{ secrets.ANDROID_KEYSTORE_PASSWORD }} -v || echo "Keystore file is missing or incorrect"
-  
-   
+
+      - name: Verify keystore content
+        run: |
+              keytool -list -keystore android/app/upload-keystore.jks -storepass string123
+          
 
       - name: Build Signed APK
         run: flutter build apk --release
