@@ -33,16 +33,6 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
-      - name: Check if Keystore Exists
-        run: |
-            echo "Checking if keystore file exists..."
-            ls -l android/app
-            file android/app/upload-keystore.jks
-            keytool -list -keystore android/app/upload-keystore.jks -storepass ${{secrets.ANDROID_KEYSTORE_PASSWORD }} -v || echo "Keystore file is missing or incorrect"
-
-      - name: Verify Keystore Content
-        run: keytool -list -keystore android/app/upload-keystore.jks -storepass "$ANDROID_KEYSTORE_PASSWORD"
-
       - name: Decode Keystore
         env:
           ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
@@ -54,6 +44,13 @@ jobs:
           echo "storePassword=${{secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
           echo "keyPassword=${{secrets.KEY_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{secrets.KEY_ALIAS }}" >> android/key.properties
+
+      - name: Check if Keystore Exists
+        run: |
+              echo "Checking if keystore file exists..."
+              ls -l android/app
+              file android/app/upload-keystore.jks
+              keytool -list -keystore android/app/upload-keystore.jks -storepass ${{secrets.ANDROID_KEYSTORE_PASSWORD }} -v || echo "Keystore file is missing or incorrect"
 
       - name: Build Signed APK
         run: flutter build apk --release
