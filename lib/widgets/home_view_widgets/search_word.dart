@@ -31,8 +31,41 @@ class _SearchWordState extends State<SearchWord> with TickerProviderStateMixin {
             child: SizedBox(
               height: 50,
               child: TextField(
+                textInputAction: TextInputAction.done,
+                onSubmitted: widget.viewModel.isLoading
+                    ? null // Disable button while loading
+                    : (val) async {
+                        FocusManager.instance.primaryFocus?.unfocus();
+
+                        await widget.viewModel.searchWord().then((val) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => WordInfoView(
+                                  wordInfoModel:
+                                      widget.viewModel.searchedWord!),
+                            ),
+                          );
+                          widget.viewModel.wordController.clear();
+                        }).onError((err, stacktrace) {
+                          progressController = AnimationController(
+                            vsync: this, // Provide vsync
+                            duration: const Duration(seconds: 5),
+                          );
+                          if (mounted) {
+                            progressController.reset(); // Reset before starting
+                            progressController.forward();
+                          }
+                          Utils.showFlushbar(
+                                  title: "No Definitions Found.",
+                                  content: err.toString(),
+                                  progressController: progressController)
+                              .show(context);
+                        });
+                      },
                 controller: widget.viewModel.wordController,
                 decoration: InputDecoration(
+                  hintText: 'Enter word here...',
                   filled: true,
                   fillColor: Colors.grey.shade200,
                   border: OutlineInputBorder(
