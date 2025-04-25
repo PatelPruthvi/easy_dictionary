@@ -28,7 +28,7 @@ class RecentSearchEmpty extends StatelessWidget {
             "Start searching for words and they'll appear here!",
             style: TextStyle(
                 fontSize: 14, color: Colors.grey, fontFamily: 'Varela'),
-            textAlign: TextAlign.center,
+            textAlign: TextAlign.left,
           ),
         ],
       ),
