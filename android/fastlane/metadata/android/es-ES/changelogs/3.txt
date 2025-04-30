@@ -1,0 +1,6 @@
+
+Presentamos Easy Dictionary: una herramienta ligera para buscar palabras rápidamente.  
+- Busca palabras y obtén definiciones y sinónimos  
+- Descubre una nueva "Palabra del día" cada vez  
+- Escucha la pronunciación para mejorar tus habilidades de habla  
+Diseñada para aprender de forma sencilla y eficiente.

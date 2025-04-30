@@ -1,0 +1,6 @@
+
+Introducing Easy Dictionary – a lightweight tool for quick word lookups.  
+- Search for words and get accurate definitions & synonyms  
+- Discover a new "Word of the Day" each time  
+- Listen to word pronunciations to improve speaking skills  
+Simple and focused — built to help you learn efficiently.

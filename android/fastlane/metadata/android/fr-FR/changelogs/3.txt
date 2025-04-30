@@ -1,0 +1,6 @@
+
+Voici Easy Dictionary – un outil léger pour rechercher rapidement des mots.  
+- Recherchez des mots et obtenez leurs définitions et synonymes  
+- Découvrez un nouveau "Mot du jour" à chaque fois  
+- Écoutez la prononciation pour améliorer votre expression orale  
+Conçu pour un apprentissage simple et efficace.
