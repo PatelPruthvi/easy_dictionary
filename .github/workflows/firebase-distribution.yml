@@ -85,7 +85,7 @@ jobs:
         working-directory: android
         env:
           SUPPLY_JSON_KEY: easydictionary-service-account-key.json
-        run: bundle exec fastlane deploy
+        run: fastlane deploy
 
 
       # - name: Distribute to Firebase App Distribution
