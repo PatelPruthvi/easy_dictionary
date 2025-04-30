@@ -1,4 +1,4 @@
-name: CI/CD - Signed Build & Firebase Distribution
+name: CI/CD - Signed Build & Google Play Store Deployment
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-distribute:
-    name: Build, Sign & Distribute to Firebase
+    name: Build, Sign & Distribute to Google Play
     runs-on: ubuntu-latest
 
     steps:
@@ -23,6 +23,10 @@ jobs:
 
       - name: Create google-services.json
         run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
+        shell: bash
+
+      - name: Create Play Console Service Account Key
+        run: echo '${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_KEY }}' > android/easydictionary-service-account-key.json
         shell: bash
 
       - name: Set up Flutter
@@ -52,20 +56,44 @@ jobs:
               file android/app/upload-keystore.jks
               keytool -list -keystore android/app/upload-keystore.jks -storepass ${{secrets.ANDROID_KEYSTORE_PASSWORD }} -v || echo "Keystore file is missing or incorrect"
 
-      - name: Build Signed APK
-        run: flutter build apk --release
+              - name: Auto Update Version (timestamp-based)
+              run: |
+                VERSION_NAME=$(date +'%Y.%m.%d')
+                VERSION_CODE=$((10000 + $GITHUB_RUN_NUMBER))
+                sed -i "s/version: .*/version: $VERSION_NAME+$VERSION_CODE/" pubspec.yaml
+                echo "Updated version to $VERSION_NAME+$VERSION_CODE"
 
-      - name: Upload Signed APK as Artifact
+      - name: Build Signed AAB
+        run: flutter build aab --release
+
+      - name: Upload Signed AAB as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Signed Build
-          path: build/app/outputs/flutter-apk/app-release.apk
-
-      - name: Distribute to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
+          path: build/app/outputs/flutter-apk/app-release.aab
+      
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          appId: ${{ secrets.FIREBASE_APP_ID }}
-          serviceCredentialsFileContent: ${{ secrets.SERVICE_ACCOUNT_KEY }}
-          groups: alpha
-          file: build/app/outputs/flutter-apk/app-release.apk
-          releaseNotes: "Automated Signed Build for Testing"
+          ruby-version: '3.1'
+      
+      - name: Install Fastlane
+        run: |
+              gem install bundler
+              bundle install
+      
+      - name: Deploy to Google Play (Fastlane)
+        working-directory: android
+        env:
+          SUPPLY_JSON_KEY: easydictionary-service-account-key.json
+        run: bundle exec fastlane deploy
+
+
+      # - name: Distribute to Firebase App Distribution
+      #   uses: wzieba/Firebase-Distribution-Github-Action@v1
+      #   with:
+      #     appId: ${{ secrets.FIREBASE_APP_ID }}
+      #     serviceCredentialsFileContent: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+      #     groups: alpha
+      #     file: build/app/outputs/flutter-apk/app-release.apk
+      #     releaseNotes: "Automated Signed Build for Testing"
