@@ -56,8 +56,8 @@ jobs:
               file android/app/upload-keystore.jks
               keytool -list -keystore android/app/upload-keystore.jks -storepass ${{secrets.ANDROID_KEYSTORE_PASSWORD }} -v || echo "Keystore file is missing or incorrect"
 
-              - name: Auto Update Version (timestamp-based)
-              run: |
+      - name: Auto Update Version (timestamp-based)
+        run: |
                 VERSION_NAME=$(date +'%Y.%m.%d')
                 VERSION_CODE=$((10000 + $GITHUB_RUN_NUMBER))
                 sed -i "s/version: .*/version: $VERSION_NAME+$VERSION_CODE/" pubspec.yaml
