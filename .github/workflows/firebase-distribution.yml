@@ -34,6 +34,15 @@ jobs:
         with:
           flutter-version: '3.x'  # Specify Flutter version
 
+      - name: Set Version Code and Name
+        run: |
+          VERSION_NAME=$(git describe --tags --abbrev=0 | sed 's/^v//')
+          VERSION_CODE=$(git rev-list --count HEAD)
+
+          echo "Using version: $VERSION_NAME+$VERSION_CODE"
+          sed -i "s/^version: .*/version: $VERSION_NAME+$VERSION_CODE/" pubspec.yaml
+
+              
       - name: Install Dependencies
         run: flutter pub get
 
@@ -56,12 +65,6 @@ jobs:
               file android/app/upload-keystore.jks
               keytool -list -keystore android/app/upload-keystore.jks -storepass ${{secrets.ANDROID_KEYSTORE_PASSWORD }} -v || echo "Keystore file is missing or incorrect"
 
-      - name: Auto Update Version (timestamp-based)
-        run: |
-                VERSION_NAME=$(date +'%Y.%m.%d')
-                VERSION_CODE=$((10000 + $GITHUB_RUN_NUMBER))
-                sed -i "s/version: .*/version: $VERSION_NAME+$VERSION_CODE/" pubspec.yaml
-                echo "Updated version to $VERSION_NAME+$VERSION_CODE"
 
       - name: Build Signed AAB
         run: flutter build aab --release
