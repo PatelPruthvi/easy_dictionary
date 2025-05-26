@@ -45,3 +45,6 @@ firebase.json
 android/app/google-services.json
 lib/firebase_options.dart
 android/easydictionary-service-account-key.json
+ios/Podfile
+ios/Flutter/Debug.xcconfig
+ios/Flutter/Release.xcconfig
