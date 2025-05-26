@@ -13,6 +13,9 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # fetch entire history (required for git describe)
+          tags: true       # fetch tags
 
          # 🎯 Create firebase_options.dart dynamically from GitHub Secrets
       - name: Create firebase_options.dart
