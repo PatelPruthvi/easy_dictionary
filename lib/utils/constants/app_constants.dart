@@ -1,3 +1,3 @@
 class AppConstants {
-  static const int timeoutDurationInSec = 10;
+  static const int timeoutDurationInSec = 30;
 }

@@ -1,34 +1,38 @@
 import 'package:flutter/material.dart';
 
-import '../../../utils/colors/app_colors.dart';
+import '../../../utils/colors/app_palette.dart';
+import '../../../utils/theme/app_theme.dart';
+import '../../common/soft_card.dart';
 
 class RecentSearchEmpty extends StatelessWidget {
   const RecentSearchEmpty({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10), color: AppColors.kLightBlue),
-      child: const Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+    final palette = AppPalette.of(context);
+    return SoftCard(
+      color: palette.cardBlue,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "No Recent Searches",
+            'No Recent Searches',
             style: TextStyle(
-                fontFamily: 'Varela',
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black),
+              fontFamily: AppTheme.fontFamily,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: palette.textPrimary,
+            ),
           ),
-          SizedBox(height: 6),
+          const SizedBox(height: 6),
           Text(
             "Start searching for words and they'll appear here!",
             style: TextStyle(
-                fontSize: 14, color: Colors.grey, fontFamily: 'Varela'),
-            textAlign: TextAlign.left,
+              fontFamily: AppTheme.fontFamily,
+              fontSize: 14,
+              color: palette.textSecondary,
+            ),
           ),
         ],
       ),

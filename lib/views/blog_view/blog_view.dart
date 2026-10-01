@@ -1,25 +1,31 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:easy_dictionary/utils/colors/app_colors.dart';
 import 'package:flutter/material.dart';
 
-import 'package:easy_dictionary/models/word_stories_model.dart';
+import '../../models/word_stories_model.dart';
+import '../../utils/colors/app_palette.dart';
+import '../../utils/theme/app_theme.dart';
 
 class BlogView extends StatelessWidget {
-  final WordStoriesModel wordStoriesModel;
   const BlogView({super.key, required this.wordStoriesModel});
+
+  final WordStoriesModel wordStoriesModel;
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppPalette.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'E-Learning Section',
           style: TextStyle(
-              fontSize: 24, fontWeight: FontWeight.w600, fontFamily: 'Varela'),
+            fontFamily: AppTheme.fontFamily,
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            color: palette.textPrimary,
+          ),
         ),
-        backgroundColor: AppColors.kLavendarTint,
+        backgroundColor: palette.cardLavender,
       ),
-      backgroundColor: AppColors.kLavendarTint,
+      backgroundColor: palette.cardLavender,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -28,21 +34,32 @@ class BlogView extends StatelessWidget {
             children: [
               Text(
                 wordStoriesModel.title,
-                style: const TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Varela'),
+                style: TextStyle(
+                  fontFamily: AppTheme.fontFamily,
+                  fontSize: 30,
+                  fontWeight: FontWeight.w600,
+                  height: 1.25,
+                  color: palette.textPrimary,
+                ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
               Text(
                 'Reading Time : ${wordStoriesModel.readingTime}',
-                style: const TextStyle(
-                    fontStyle: FontStyle.italic, fontFamily: 'Varela'),
+                style: TextStyle(
+                  fontFamily: AppTheme.fontFamily,
+                  fontStyle: FontStyle.italic,
+                  color: palette.textSecondary,
+                ),
               ),
               const SizedBox(height: 20),
               Text(
                 wordStoriesModel.content,
-                style: const TextStyle(fontSize: 24, fontFamily: 'Varela'),
+                style: TextStyle(
+                  fontFamily: AppTheme.fontFamily,
+                  fontSize: 18,
+                  height: 1.6,
+                  color: palette.textPrimary,
+                ),
               ),
             ],
           ),

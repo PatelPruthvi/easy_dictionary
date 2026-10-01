@@ -52,4 +52,13 @@ class UrlCannotLaunchException extends AppException {
 class RateLimiterException extends AppException {
   RateLimiterException() : super(ErrorMessages.rateLimiter);
 }
+
+class PronunciationUnavailableException extends AppException {
+  PronunciationUnavailableException()
+      : super(ErrorMessages.pronunciationUnavailable);
+}
+
+class LanguagesUnavailableException extends AppException {
+  LanguagesUnavailableException() : super(ErrorMessages.languages);
+}
 // Add more custom exceptions as needed...

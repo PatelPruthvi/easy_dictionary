@@ -17,16 +17,17 @@ jobs:
           fetch-depth: 0   # fetch entire history (required for git describe)
           tags: true       # fetch tags
 
-         # 🎯 Create firebase_options.dart dynamically from GitHub Secrets
       - name: Create firebase_options.dart
         run: echo "$FIREBASE_OPTIONS" > lib/firebase_options.dart
         shell: bash
         env:
-            FIREBASE_OPTIONS: ${{ secrets.FIREBASE_OPTIONS }}
+          FIREBASE_OPTIONS: ${{ secrets.FIREBASE_OPTIONS }}
 
       - name: Create google-services.json
-        run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
+        run: echo "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
         shell: bash
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
 
       - name: Create Play Console Service Account Key
         run: echo '${{ secrets.PLAY_CONSOLE_SERVICE_ACCOUNT_KEY }}' > android/easydictionary-service-account-key.json
@@ -35,7 +36,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x'  # Specify Flutter version
+          flutter-version: '3.29.2'
 
       - name: Set Version Code and Name
         run: |
@@ -76,7 +77,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Signed Build
-          path: build/app/outputs/flutter-apk/app-release.aab
+          path: build/app/outputs/bundle/release/app-release.aab
       
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1

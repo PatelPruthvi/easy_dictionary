@@ -30,6 +30,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+firebase.json
 
 # Symbolication related
 app.*.symbols
@@ -41,7 +42,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-firebase.json
+/android/app/.cxx/
 android/app/google-services.json
 lib/firebase_options.dart
 android/easydictionary-service-account-key.json

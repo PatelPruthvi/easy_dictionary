@@ -1,90 +1,100 @@
-import 'package:easy_dictionary/utils/utils.dart';
-import 'package:easy_dictionary/widgets/word_info_widgets/meanings_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import '../../models/dictionary_model.dart';
-import '../../utils/colors/app_colors.dart';
+import '../../utils/colors/app_palette.dart';
+import '../../utils/theme/app_theme.dart';
+import '../../utils/utils.dart';
 import '../../view_model/word_info_view_model.dart';
+import 'meanings_list.dart';
 
-class WordInfo extends StatefulWidget {
-  const WordInfo(
-      {super.key, required this.viewModel, required this.wordInfoModel});
+class WordInfo extends StatelessWidget {
+  const WordInfo({super.key, required this.viewModel});
 
   final WordInfoViewModel viewModel;
-  final DictionaryModel wordInfoModel;
 
-  @override
-  State<WordInfo> createState() => _WordInfoState();
-}
-
-class _WordInfoState extends State<WordInfo> with TickerProviderStateMixin {
-  late AnimationController progressController;
   @override
   Widget build(BuildContext context) {
+    final model = viewModel.wordInfoModel;
+    final palette = AppPalette.of(context);
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       decoration: BoxDecoration(
-          color: AppColors.kLightPurple,
-          borderRadius: BorderRadius.circular(10)),
+        color: palette.cardPurple,
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                widget.wordInfoModel.word,
-                style: const TextStyle(
-                    fontFamily: 'Varela',
+              Expanded(
+                child: Text(
+                  model.word,
+                  style: TextStyle(
+                    fontFamily: AppTheme.fontFamily,
                     fontSize: 24,
-                    fontWeight: FontWeight.bold),
+                    fontWeight: FontWeight.bold,
+                    color: palette.textPrimary,
+                  ),
+                ),
               ),
-              IconButton.filled(
-                  color: Colors.black,
-                  onPressed: () async {
-                    await widget.viewModel
-                        .playAudio()
-                        .onError((err, stacktrace) {
-                      progressController = AnimationController(
-                          vsync: this, duration: const Duration(seconds: 5));
-                      if (mounted) {
-                        progressController.reset();
-                        progressController.forward();
-                      }
-                      Utils.showFlushbar(
-                              title: "Unable to play audio.",
-                              content: err.toString(),
-                              progressController: progressController)
-                          .show(context);
-                    });
-                  },
-                  style: IconButton.styleFrom(
-                      backgroundColor: AppColors.kMediumPurple),
-                  icon: widget.viewModel.isAudioLoading
-                      ? const SizedBox(
-                          height: 12,
-                          width: 12,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.volume_up_outlined))
+              IconButton(
+                tooltip: 'Copy word',
+                style: ButtonStyle(
+                  backgroundColor:
+                      WidgetStatePropertyAll(palette.accentPurple),
+                ),
+                color: palette.textPrimary,
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: model.word));
+                  Utils.showInfo(
+                    context,
+                    title: 'Word copied to clipboard!',
+                    icon: Icons.copy_outlined,
+                  );
+                },
+                icon: const Icon(Icons.copy_outlined),
+              ),
+              const SizedBox(width: 6),
+              IconButton(
+                tooltip: 'Pronounce',
+                style: ButtonStyle(
+                  backgroundColor:
+                      WidgetStatePropertyAll(palette.accentPurple),
+                ),
+                color: palette.textPrimary,
+                onPressed: viewModel.isAudioLoading
+                    ? null
+                    : () async {
+                        try {
+                          await viewModel.speak();
+                        } catch (error) {
+                          if (!context.mounted) return;
+                          Utils.showError(
+                            context,
+                            title: 'Unable to play audio.',
+                            message: error.toString(),
+                          );
+                        }
+                      },
+                icon: viewModel.isAudioLoading
+                    ? SizedBox(
+                        height: 12,
+                        width: 12,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: palette.textPrimary,
+                        ),
+                      )
+                    : const Icon(Icons.volume_up_outlined),
+              ),
             ],
           ),
-          Text(
-            widget.wordInfoModel.phonetic ??
-                widget.wordInfoModel.phonetics
-                    .firstWhere(
-                      (phon) => phon.text != null,
-                      orElse: () => Phonetic(text: ""),
-                    )
-                    .text ??
-                "",
-          ),
-          const SizedBox(height: 30),
-          WordDropdown(
-              wordInfoModel: widget.wordInfoModel, viewModel: widget.viewModel),
-          MeaningsList(
-              wordInfoModel: widget.wordInfoModel, viewModel: widget.viewModel),
+          const SizedBox(height: 24),
+          WordDropdown(viewModel: viewModel),
+          MeaningsList(viewModel: viewModel),
         ],
       ),
     );
@@ -92,40 +102,57 @@ class _WordInfoState extends State<WordInfo> with TickerProviderStateMixin {
 }
 
 class WordDropdown extends StatelessWidget {
-  const WordDropdown(
-      {super.key, required this.wordInfoModel, required this.viewModel});
+  const WordDropdown({super.key, required this.viewModel});
 
-  final DictionaryModel wordInfoModel;
   final WordInfoViewModel viewModel;
 
   @override
   Widget build(BuildContext context) {
+    final labels = viewModel.wordInfoModel.entryLabels;
+    final palette = AppPalette.of(context);
+
+    if (labels.length < 2) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 4),
+        child: Text(
+          labels.isEmpty ? '' : labels.first,
+          style: TextStyle(
+            fontFamily: AppTheme.fontFamily,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            fontStyle: FontStyle.italic,
+            color: palette.textPrimary,
+          ),
+        ),
+      );
+    }
+
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: AppColors.kMediumPurple,
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        color: palette.accentPurple,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
-      child: DropdownButton(
-          elevation: 8,
-          isExpanded: true,
-          underline: const Text(''),
-          borderRadius: BorderRadius.circular(10),
-          value: viewModel.dropdownIdx,
-          style: const TextStyle(
-              fontFamily: 'Varela',
-              color: Colors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.w500),
-          icon: const Icon(Icons.keyboard_arrow_down_rounded),
-          items: [
-            for (int i = 0; i < wordInfoModel.meanings.length; i++)
-              DropdownMenuItem<int>(
-                  value: i, child: Text(wordInfoModel.meanings[i].partOfSpeech))
-          ],
-          onChanged: (val) {
-            viewModel.changeDropdownIndex(val ?? 0);
-          }),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: DropdownButton<int>(
+        elevation: 8,
+        isExpanded: true,
+        underline: const SizedBox.shrink(),
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        value: viewModel.entryIndex,
+        style: TextStyle(
+          fontFamily: AppTheme.fontFamily,
+          color: palette.textPrimary,
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
+        dropdownColor: palette.accentPurple,
+        icon: Icon(Icons.keyboard_arrow_down_rounded, color: palette.textPrimary),
+        items: [
+          for (int i = 0; i < labels.length; i++)
+            DropdownMenuItem<int>(value: i, child: Text(labels[i])),
+        ],
+        onChanged: (value) => viewModel.changeEntryIndex(value ?? 0),
+      ),
     );
   }
 }

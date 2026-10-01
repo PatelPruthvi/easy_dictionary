@@ -16,9 +16,13 @@ class ErrorMessages {
   static const String audio =
       "Audio pronunciation not available for this word.";
   static const String audioPlayerError =
-      'Unable to fetch and play the audio. Please check your connection and try again.';
+      'Unable to play the pronunciation right now. Please try again.';
   static const String url =
       "Failed to open link. Please check your browser or internet settings.";
+  static const String pronunciationUnavailable =
+      "No speech voice is installed for this language on your device.";
+  static const String languages =
+      "Couldn't load the language list. Pull to refresh or try again later.";
   static const String rateLimiter =
       "You've reached the request limit. Try again in a few minutes.";
 }

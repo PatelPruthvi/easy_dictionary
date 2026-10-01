@@ -1,4 +1,38 @@
+import '../../models/language_model.dart';
+
 class AppResources {
+  /// Shown as the default search language and the Word of the Day language.
+  static const LanguageModel defaultLanguage =
+      LanguageModel(code: 'en', name: 'English', words: 1365322);
+
+  /// Used when `GET /languages` cannot be reached, so the picker is never empty.
+  static const List<LanguageModel> fallbackLanguages = [
+    defaultLanguage,
+    LanguageModel(code: 'es', name: 'Spanish'),
+    LanguageModel(code: 'fr', name: 'French'),
+    LanguageModel(code: 'de', name: 'German'),
+    LanguageModel(code: 'it', name: 'Italian'),
+    LanguageModel(code: 'pt', name: 'Portuguese'),
+    LanguageModel(code: 'nl', name: 'Dutch'),
+    LanguageModel(code: 'ru', name: 'Russian'),
+    LanguageModel(code: 'pl', name: 'Polish'),
+    LanguageModel(code: 'la', name: 'Latin'),
+    LanguageModel(code: 'sv', name: 'Swedish'),
+    LanguageModel(code: 'hi', name: 'Hindi'),
+    LanguageModel(code: 'ja', name: 'Japanese'),
+    LanguageModel(code: 'zh', name: 'Chinese'),
+    LanguageModel(code: 'ar', name: 'Arabic'),
+    LanguageModel(code: 'ko', name: 'Korean'),
+    LanguageModel(code: 'tr', name: 'Turkish'),
+  ];
+
+  /// Language codes offered as quick picks above the full list.
+  static const List<String> suggestedLanguageCodes = [
+    'en', 'es', 'fr', 'de', 'it', 'pt', 'hi', 'ja',
+  ];
+
+  /// Curated words that back the Word of the Day when the random word API is
+  /// unreachable or keeps returning words the dictionary does not know.
   static const List<String> wordOfTheDayList = [
     "Benevolent",
     "Candid",
@@ -100,30 +134,15 @@ class AppResources {
     "Yen",
     "Zenith"
   ];
-  static String getWordOfTheDay() {
-    int index = DateTime.now().day % wordOfTheDayList.length;
-    return wordOfTheDayList[index];
+  /// A stable-per-day pick from [wordOfTheDayList].
+  static String fallbackWordOfTheDay([DateTime? now]) {
+    final today = now ?? DateTime.now();
+    final dayOfYear =
+        today.difference(DateTime(today.year)).inDays;
+    return wordOfTheDayList[dayOfYear % wordOfTheDayList.length];
   }
 
   static const List<Map<String, String>> wordStoryblogs = [
-    {
-      "title": "The Importance of Context in Word Definitions",
-      "content":
-          "A word's meaning can change depending on context. For example, 'light' can mean 'not heavy' (adjective) or 'a source of illumination' (noun). Words also take on figurative meanings, like 'a bright student' (intelligent, not literally glowing). Understanding context helps in choosing the right word and avoiding misinterpretation.",
-      "reading_time": "4 min"
-    },
-    {
-      "title": "Phonetics: Why Do Words Sound Different Than They Look?",
-      "content":
-          "Phonetics is the study of speech sounds. English pronunciation often differs from spelling because words come from multiple languages, leading to silent letters and varied pronunciations. For example, 'knight' has a silent 'k' due to historical changes in speech patterns. Phonetic transcriptions, like /nait/ for 'night', help learners pronounce words correctly.",
-      "reading_time": "4 min"
-    },
-    {
-      "title": "What Are Homophones, and Why Do They Cause Confusion?",
-      "content":
-          "Homophones are words that sound the same but have different meanings and spellings, like 'their', 'there', and 'they're'. They often cause spelling mistakes and misunderstandings. Knowing the meaning and context of homophones helps in clear writing. A simple trick: 'there' relates to location, 'their' shows possession, and 'they're' is a contraction of 'they are'.",
-      "reading_time": "5 min"
-    },
     {
       "title": "Etymology: The Hidden History of Words",
       "content":
@@ -141,6 +160,12 @@ class AppResources {
       "content":
           "Dictionaries are updated regularly as language evolves. Words like 'selfie' and 'emoji' were added recently due to their widespread use. Some words also change meaning over time—'awful' once meant 'full of awe' but now means 'very bad'. Understanding language evolution helps us appreciate the dynamic nature of words.",
       "reading_time": "8 min"
+    },
+    {
+      "title": "The Small Habit That Makes New Words Stick",
+      "content":
+          "Meeting a new word once rarely makes it part of your vocabulary. Try a three-step routine: notice the word in a sentence, write a sentence of your own, then bring it back a day later without looking. For example, if you learn 'nimble', you might write, 'Her nimble fingers repaired the watch.' The effort of retrieving a word strengthens the memory more than rereading a list. Keep the routine brief and attach it to something you already do, such as reviewing notes after breakfast.",
+      "reading_time": "3 min"
     }
   ];
 }

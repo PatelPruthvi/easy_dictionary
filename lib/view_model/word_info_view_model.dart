@@ -1,73 +1,88 @@
-import 'package:audioplayers/audioplayers.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_dictionary/data/exception/app_exceptions.dart';
+import 'package:easy_dictionary/data/pronunciation/pronunciation_service.dart';
 import 'package:easy_dictionary/models/dictionary_model.dart';
+import 'package:easy_dictionary/repository/dictionary_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class WordInfoViewModel extends ChangeNotifier {
+import 'safe_notifier.dart';
+
+class WordInfoViewModel extends ChangeNotifier with SafeNotifier {
+  WordInfoViewModel({
+    required this.wordInfoModel,
+    DictionaryRepo? repository,
+  }) : _repository = repository ?? DictionaryRepo();
+
   final DictionaryModel wordInfoModel;
-  int dropdownIdx = 0;
-  final _audioPlayer = AudioPlayer();
-  bool _isPlaying = false;
+  final DictionaryRepo _repository;
+
+  /// Index into [DictionaryModel.entries] - one entry per part of speech.
+  int entryIndex = 0;
   bool isAudioLoading = false;
 
-  WordInfoViewModel({required this.wordInfoModel});
+  /// Set while a tapped synonym / antonym is being looked up.
+  bool isLookupLoading = false;
 
-  void changeDropdownIndex(int index) {
-    dropdownIdx = index;
+  /// Sense indexes whose quotations are expanded.
+  final Set<String> _expandedQuotes = {};
+
+  WordEntry get currentEntry => wordInfoModel.entries[entryIndex];
+
+  /// Part of speech of the open entry, numbered when it is not unique.
+  String get currentEntryLabel => wordInfoModel.entryLabels[entryIndex];
+
+  String get languageCode => wordInfoModel.language?.code ?? 'en';
+
+  void changeEntryIndex(int index) {
+    if (index == entryIndex || index < 0 || index >= wordInfoModel.entries.length) {
+      return;
+    }
+    entryIndex = index;
     notifyListeners();
   }
 
-  Future<void> playAudio() async {
-    String? audioUrl = wordInfoModel.phonetics
-        .firstWhere((phonetic) => phonetic.audio != null,
-            orElse: () => Phonetic(audio: ""))
-        .audio;
+  bool isQuotesExpanded(String senseKey) => _expandedQuotes.contains(senseKey);
 
-    if (!_isPlaying) {
-      if (audioUrl != null && audioUrl.isNotEmpty) {
-        isAudioLoading = true;
-        notifyListeners();
-        final connectivityResult = await Connectivity().checkConnectivity();
-        if (connectivityResult.contains(ConnectivityResult.none)) {
-          isAudioLoading = false;
-          notifyListeners();
-          throw AudioUnableToPlayException();
-        }
-        await _audioPlayer.setSourceUrl(audioUrl).then((val) {
-          _audioPlayer.resume();
-          _isPlaying = true;
-          isAudioLoading = false;
-          notifyListeners();
-        }).timeout(
-          const Duration(seconds: 8),
-          onTimeout: () {
-            isAudioLoading = false;
-            _isPlaying = false;
-            notifyListeners();
-            throw AudioUnableToPlayException();
-          },
-        );
+  void toggleQuotes(String senseKey) {
+    if (!_expandedQuotes.remove(senseKey)) _expandedQuotes.add(senseKey);
+    notifyListeners();
+  }
 
-        _audioPlayer.onPlayerComplete.listen(cancelOnError: true, (_) {
-          _isPlaying = false;
-          notifyListeners();
-        });
-      } else {
-        throw AudioNotAvailableException();
-      }
+  Future<void> speak([String? text]) async {
+    isAudioLoading = true;
+    notifyListeners();
+    try {
+      await PronunciationService.instance.speak(
+        text: text ?? wordInfoModel.word,
+        languageCode: languageCode,
+      );
+    } finally {
+      isAudioLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Looks up a related word (synonym, antonym, form) in the same language.
+  Future<DictionaryModel> lookupRelated(String word) async {
+    isLookupLoading = true;
+    notifyListeners();
+    try {
+      return await _repository.fetchWordDetails(
+        word: word,
+        languageCode: languageCode,
+      );
+    } finally {
+      isLookupLoading = false;
+      notifyListeners();
     }
   }
 
   Future<void> openUrl(String url) async {
-    final Uri uri = Uri.parse(url);
-    bool canLaunch = await canLaunchUrl(uri);
-    if (canLaunch) {
-      await launchUrl(uri);
-    } else {
-      // HANDLE ERROR
+    if (url.trim().isEmpty) throw UrlCannotLaunchException();
+    final uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       throw UrlCannotLaunchException();
     }
   }
+
 }
