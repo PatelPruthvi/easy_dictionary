@@ -44,8 +44,14 @@ app.*.map.json
 /android/app/release
 /android/app/.cxx/
 android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+**/GoogleService-Info.plist
 lib/firebase_options.dart
 android/easydictionary-service-account-key.json
+**/*service-account*.json
+**/*serviceAccount*.json
+android/app/upload-keystore.jks
+android/key.properties
 ios/Podfile
 ios/Flutter/Debug.xcconfig
 ios/Flutter/Release.xcconfig

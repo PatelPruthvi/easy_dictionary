@@ -38,6 +38,15 @@ jobs:
         with:
           flutter-version: '3.29.2'
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Accept Android SDK licenses
+        run: yes | flutter doctor --android-licenses
+
       - name: Set Version Code and Name
         run: |
           VERSION_NAME=$(git describe --tags --abbrev=0 | sed 's/^v//')
